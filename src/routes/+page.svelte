@@ -16,12 +16,12 @@ function sendRequest() {
         "headers": {
             "Accept": "*/*",
             "Accept-Encoding": "gzip, deflate",
-            "Authorization": "Basic YjEyMTJjOTI5NGJlZWUyYjY1MmEyYTkxNzVkMmQwNTU6YzFhZGU0YWY5M2YxNjFlNTcyZDM4MGMxMjA4M2JlZjc=",
+            "Authorization": "*********************", // TO DO
             "Content-Type": "application/json"
         },
         "body": JSON.stringify({
             img: img
-        })
+        }) 
     })
     .then(response => response.text())
     .then(text => {
@@ -36,8 +36,8 @@ function checkStatus() {
     fetch("https://api.beam.cloud/v1/task/" + taskId + "/status/", {
     "method": "GET",
     "headers": {
-        "Authorization": "Basic YjEyMTJjOTI5NGJlZWUyYjY1MmEyYTkxNzVkMmQwNTU6YzFhZGU0YWY5M2YxNjFlNTcyZDM4MGMxMjA4M2JlZjc=",
-        "Content-Type": "application/json"
+        "Authorization": "*********************", // TO DO
+         "Content-Type": "application/json"
     },
     })
     .then(response => response.text())
