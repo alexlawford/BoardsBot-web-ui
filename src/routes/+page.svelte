@@ -1,22 +1,27 @@
 <script>
+import { onMount } from 'svelte';
 
 let responseText;
 let requestSent;
 let taskId;
 let taskResponse;
+let imgUrl;
 
 function sendRequest() {
     requestSent = true;
+    let img = panelCanvasStage.render();
 
     fetch("https://sqwi2.apps.beam.cloud", {
-    "method": "POST",
-    "headers": {
-        "Accept": "*/*",
-        "Accept-Encoding": "gzip, deflate",
-        "Authorization": "Basic YjEyMTJjOTI5NGJlZWUyYjY1MmEyYTkxNzVkMmQwNTU6YzFhZGU0YWY5M2YxNjFlNTcyZDM4MGMxMjA4M2JlZjc=",
-        "Content-Type": "application/json"
-    },
-    "body": JSON.stringify({})
+        "method": "POST",
+        "headers": {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Authorization": "Basic YjEyMTJjOTI5NGJlZWUyYjY1MmEyYTkxNzVkMmQwNTU6YzFhZGU0YWY5M2YxNjFlNTcyZDM4MGMxMjA4M2JlZjc=",
+            "Content-Type": "application/json"
+        },
+        "body": JSON.stringify({
+            img: img
+        })
     })
     .then(response => response.text())
     .then(text => {
@@ -37,15 +42,45 @@ function checkStatus() {
     })
     .then(response => response.text())
     .then(text => {
-        let status = JSON.parse(test)['status'];
-        taskResponse = "Status is: " + status;
+        let parsedResponse = JSON.parse(text);
+        taskResponse = "Status is: " + parsedResponse['status'];
+        console.log(text);
+        if(parsedResponse['status'] == 'COMPLETE') {
+            imgUrl = parsedResponse['outputs']['./output.png']['url'];
+        }
     })
     .catch(err => console.error(err));
+}
+
+let panelCanvas;
+let panelCanvasStage;
+
+onMount(async () => {
+    panelCanvas = (await import('$lib/newPanelCanvas.svelte')).default;
+})
+
+function addHead() {
+    panelCanvasStage.addHead();
+}
+
+function addtos() {
+    panelCanvasStage.addToS();
+}
+
+function addtot() {
+    panelCanvasStage.addToT();
+}
+
+function takes() {
+    panelCanvasStage.takeS();
+}
+
+function taket() {
+    panelCanvasStage.takeT();
 }
 </script>
 
 <h1>Welcome to BoardsBot</h1>
-
 {#if requestSent}
     {#if responseText}
         <p>{responseText} <button on:click={checkStatus}>Check task status</button></p>
@@ -58,3 +93,15 @@ function checkStatus() {
 {:else}
     <p><button on:click={sendRequest}>Send request</button></p>
 {/if}
+{#if imgUrl}
+    <p><img src="{imgUrl}" alt="The AI generated result"/></p>
+{/if}
+
+<div>
+    <svelte:component this={panelCanvas} bind:konvaCanvas={panelCanvasStage} />
+</div>
+<p><button on:click={addHead}>Add Head</button></p>
+<p><button on:click={addtot}>t+</button></p>
+<p><button on:click={addtos}>s+</button></p>
+<p><button on:click={taket}>t-</button></p>
+<p><button on:click={takes}>s-</button></p>
