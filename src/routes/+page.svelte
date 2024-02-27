@@ -59,25 +59,10 @@ onMount(async () => {
     panelCanvas = (await import('$lib/newPanelCanvas.svelte')).default;
 })
 
-function addHead() {
-    panelCanvasStage.addHead();
+function addFigure() {
+    return panelCanvasStage.addFigure();
 }
 
-function addtos() {
-    panelCanvasStage.addToS();
-}
-
-function addtot() {
-    panelCanvasStage.addToT();
-}
-
-function takes() {
-    panelCanvasStage.takeS();
-}
-
-function taket() {
-    panelCanvasStage.takeT();
-}
 </script>
 
 <h1>Welcome to BoardsBot</h1>
@@ -97,11 +82,14 @@ function taket() {
     <p><img src="{imgUrl}" alt="The AI generated result"/></p>
 {/if}
 
-<div>
+<div class="temp">
     <svelte:component this={panelCanvas} bind:konvaCanvas={panelCanvasStage} />
 </div>
-<p><button on:click={addHead}>Add Head</button></p>
-<p><button on:click={addtot}>t+</button></p>
-<p><button on:click={addtos}>s+</button></p>
-<p><button on:click={taket}>t-</button></p>
-<p><button on:click={takes}>s-</button></p>
+<p><button on:click={addFigure}>Add Figure</button></p>
+
+<style>
+    .temp {
+        border: 1px solid #000;
+        width:768px;
+    }
+</style>
