@@ -59,8 +59,14 @@ onMount(async () => {
     panelCanvas = (await import('$lib/newPanelCanvas.svelte')).default;
 })
 
+let last = 0; // TEMP
+
 function addFigure() {
-    return panelCanvasStage.addFigure();
+    last = panelCanvasStage.addFigure();
+}
+
+function scaleFigure(by) {
+    return panelCanvasStage.scaleFigure(last, by);
 }
 
 </script>
@@ -86,6 +92,8 @@ function addFigure() {
     <svelte:component this={panelCanvas} bind:konvaCanvas={panelCanvasStage} />
 </div>
 <p><button on:click={addFigure}>Add Figure</button></p>
+<p><button on:click={() => scaleFigure(0.1)}>Scale +</button></p>
+<p><button on:click={() => scaleFigure(-0.1)}>Scale -</button></p>
 
 <style>
     .temp {
