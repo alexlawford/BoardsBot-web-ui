@@ -1,5 +1,6 @@
 <script>
-import { Stage, Layer, Circle, Line } from 'svelte-konva'
+import { Stage, Layer, Circle, Line, Rect } from 'svelte-konva'
+    import { scale } from 'svelte/transition';
 
 // Structures
 const figure = () => {
@@ -7,25 +8,26 @@ const figure = () => {
         joints: [
             [0, -27, 27],   // 0 Nose
             [0, 0],         // 1 Neck
-            [-30, 3],       // 2 Right Shoulder
+            [-34, 3],       // 2 Right Shoulder
             [-65, 58],      // 3 Right Elbow
             [-105, 93],     // 4 Right Wrist
-            [30, 3],        // 5 Left Shoulder
+            [34, 3],        // 5 Left Shoulder
             [65, 58],       // 6 Left Elbow
             [105, 93],      // 7 Left Wrist
             [-18, 98],      // 8 Right Hip
-            [-20, 193],     // 9 Right Knee
-            [-22, 288],     // 10 Right Ankle
+            [-20, 203],     // 9 Right Knee
+            [-22, 300],     // 10 Right Ankle
             [18, 98],       // 11 Left Hip
-            [20, 193],      // 12 Left Knee
-            [22, 288],      // 13 Left Ankle
+            [20, 203],      // 12 Left Knee
+            [22, 300],      // 13 Left Ankle
             [-11, -38, 26], // 14 Right Eye
             [11, -38, 26],  // 15 Left Eye
             [-26, -35, 10], // 16 Right Ear
             [26, -35, 10],  // 17 Left Ear
             [0, -38]        // -- Additional -- Head Positioning
         ],
-        head_rotation: [0, 0]
+        head_rotation: [0, 0],
+        scale: 1
     }
 }
 
@@ -44,11 +46,11 @@ const relations = [
     [12, 13],            // 11
     [13],                // 12
     [],                  // 13
-    [16],                // 14
-    [17],                // 15
+    [],                  // 14
+    [],                  // 15
     [],                  // 16
     [],                  // 17
-    [0, 14, 15, 16, 17] // -- Additional -- Head Positioning
+    [0, 14, 15, 16, 17]  // -- Additional -- Head Positioning
 ]
 
 const bones = [
@@ -93,51 +95,82 @@ function rotateY (point, theta) {
     ]
 }
 
-const update = (message, args = {}) => {
-
-    const methods = {
-        addfigure : () => {
-            model.figures.push(figure())
-            return model
-        },
-        rotate_x : ({figure_index, theta}) => {
-            let ox = model.figures[figure_index].joints[18][0]
-            let oy = model.figures[figure_index].joints[18][1]
-
-            let was = model.figures[figure_index].head_rotation[0]
-            model.figures[figure_index].head_rotation[1] += theta
-
-            methods.rotate_y({figure_index: figure_index, theta: -1 * was})
-
-            for(let j of [0, 14, 15, 16, 17]) {                
-                model.figures[figure_index].joints[j][0] -= ox
-                model.figures[figure_index].joints[j][1] -= oy
-                model.figures[figure_index].joints[j] = rotateX(model.figures[figure_index].joints[j], theta)
-                model.figures[figure_index].joints[j][0] += ox
-                model.figures[figure_index].joints[j][1] += oy
-            }
-
-            return methods.rotate_y({figure_index: figure_index, theta: was})
-        },
-        rotate_y : ({figure_index, theta}) => {                     
-            model.figures[figure_index].head_rotation[0] += theta
-
-            let ox = model.figures[figure_index].joints[18][0]
-            let oy = model.figures[figure_index].joints[18][1]
-
-            for(let j of [0, 14, 15, 16, 17]) {
-                model.figures[figure_index].joints[j][0] -= ox
-                model.figures[figure_index].joints[j][1] -= oy
-                model.figures[figure_index].joints[j] = rotateY(model.figures[figure_index].joints[j], theta)
-                model.figures[figure_index].joints[j][0] += ox
-                model.figures[figure_index].joints[j][1] += oy
-            }
-            return model
-        }, 
+const vec2 = {
+    sum : (a, b) => {
+        return [
+            a[0] + b[0],
+            a[1] + b[1],
+            a[2]
+        ]
+    },
+    sub : (a, b) => {
+        return [
+            a[0] - b[0],
+            a[1] - b[1],
+            a[2]
+        ]
     }
+}
+const update = {
+    addfigure : () => {
+        let f = figure()
+        // positioning on canvas
+        f.joints = f.joints.map(j => vec2.sum(j, [384, 100]))
+        model.figures.push(f)
+        model = model
+    },
+    rotate_x : (f, theta) => {
+        model.figures[f].head_rotation[1] += theta
 
-    if(message in methods) {
-        model = methods[message](args)
+        let was = model.figures[f].head_rotation[0]
+
+        update.rotate_y(f, -1 * was)
+
+        for(let j of [0, 14, 15, 16, 17]) {             
+            model.figures[f].joints[j] = vec2.sum(
+                rotateX(
+                    vec2.sub(model.figures[f].joints[j], model.figures[f].joints[18]),
+                    theta
+                ),
+                model.figures[f].joints[18]
+            )
+        }
+
+        update.rotate_y(f, was)
+    },
+    rotate_y : (f, theta) => {                     
+        model.figures[f].head_rotation[0] += theta
+
+        for(let j of [0, 14, 15, 16, 17]) {
+            model.figures[f].joints[j] = vec2.sum(
+                rotateY(
+                    vec2.sub(model.figures[f].joints[j], model.figures[f].joints[18]),
+                    theta
+                ),
+                model.figures[f].joints[18]
+            )
+        }
+    },
+    // TO DO *** !!!
+    // TO DO -- selecting which figure
+    // TO DO *** !!!
+    scale : (factor, figure_index = 0) => {
+       
+        let ox = model.figures[figure_index].joints[1][0]
+        let oy = model.figures[figure_index].joints[1][1]
+
+        model.figures[figure_index].joints.forEach((j, index) => {
+            if(j != 1) {
+                let x = j[0]
+                let y = j[1]
+                let dx = x - ox 
+                let dy = y - oy
+                model.figures[figure_index].joints[index][0] = x + (dx * factor)
+                model.figures[figure_index].joints[index][1] = y + (dy * factor)
+            }
+        })
+
+        model.figures[figure_index].scale *= 1 + factor
     }
 }
 
@@ -187,16 +220,16 @@ const evs = {
 
         if(evs.was_pos) {
             if(pos.x > evs.was_pos.x) {
-                update('rotate_y', {figure_index: figure_index, theta: speed})
+                update.rotate_y(figure_index, speed)
             }
             if(pos.x < evs.was_pos.x) {
-                update('rotate_y', {figure_index: figure_index, theta: -1 * speed})
+                update.rotate_y(figure_index, -1 * speed)
             }
             if(pos.y > evs.was_pos.y) {
-                update('rotate_x', {figure_index: figure_index, theta: -1 * speed})
+                update.rotate_x(figure_index, -1 * speed)
             }
             if(pos.y < evs.was_pos.y) {
-                update('rotate_x', {figure_index: figure_index, theta: speed})
+                update.rotate_x(figure_index, speed)
             }
         }
 
@@ -208,19 +241,80 @@ const evs = {
 }
 
 // Export
-let stage;
+let stage
+ 
+let colours = {
+    joints: [
+        '#FF0000',
+        '#FF5500',
+        '#FFAA00',
+        '#FFFF00',
+        '#AAFF00',
+        '#55FF00',
+        '#00FF00',
+        '#00FF55',
+        '#00FFAA',
+        '#00FFFF',
+        '#00AAFF',
+        '#0055FF',
+        '#0000FF',
+        '#5500FF',
+        '#AA00FF',
+        '#FF00FF',
+        '#FF00AA',
+        '#FF0055'
+    ],
+    bones: [
+        '#990000',
+        '#993300',
+        '#996600',
+        '#999900',
+        '#669900',
+        '#339900',
+        '#009900',
+        '#009933',
+        '#009966',
+        '#009999',
+        '#006699',
+        '#003399',
+        '#000099',
+        '#330099',
+        '#660099',
+        '#990099',
+        '#990066'
+    ]
+}
+
+let mask = false
+
+let rendering = false
 
 export const konvaCanvas = {
     addFigure: () => {
-        update('addfigure')
+        update.addfigure()
+    },
+    scale: (by) => {
+        update.scale(by)
+    },
+    render: () => {
+        rendering = true
+   //   mask = true
     }
 }
 
 </script>
-<Stage config={{width: 512, height: 512}} bind:handle={stage}>
+<Stage config={{width: 768, height: 432}} bind:handle={stage}>
     <Layer>
-    </Layer>
-    <Layer>
+        <Rect
+            config={{
+                x: 0,
+                y: 0,
+                width: 768,
+                height: 432,
+                fill: '#000',
+                visible: rendering
+            }}
+        />
     </Layer>
     <Layer>
         {#each model.figures as figure, figure_index}
@@ -228,10 +322,12 @@ export const konvaCanvas = {
                 config={{
                     x: figure.joints[18][0],
                     y: figure.joints[18][1],
-                    stroke: "#000",
+                    stroke: '#000000',
+                    fill: '#FFFFFF',
                     strokeWidth: 3,
-                    radius: 28, // TO DO
-                    draggable: true
+                    radius: mask ? figure.scale * 40 : figure.scale * 28,
+                    draggable: true, 
+                    visible: mask || ! rendering
                 }}
                 on:dragstart={
                     () => evs.draghead_start(figure_index)
@@ -241,12 +337,13 @@ export const konvaCanvas = {
                 }
                 on:dragend={evs.draghead_end}
             />
-            {#each bones as b}
+            {#each bones as b, b_index}
                 <Line 
-                    config={{ // 
+                    config={{ 
                         points: [figure.joints[b[0]][0], figure.joints[b[0]][1], figure.joints[b[1]][0], figure.joints[b[1]][1]],
-                        stroke: "#000", 
-                        strokeWidth: 3
+                        stroke: mask ? '#fff' : rendering ? colours.bones[b_index] : "#000", 
+                        strokeWidth: mask ? figure.scale * 40 : 4,
+                        lineCap: 'round'
                     }}
                 />
             {/each}
@@ -256,8 +353,9 @@ export const konvaCanvas = {
                         x: joint[0],
                         y: joint[1],
                         radius: 4,
-                        fill: '#000',
-                        draggable: ! [0, 13, 14, 15, 16, 17].includes(joint_index),
+                        fill: rendering ? colours.joints[joint_index] : '#000',
+                        draggable: ! [0, 14, 15, 16, 17].includes(joint_index),
+                        visible: ! mask
                     }}
                     on:dragstart={
                         () => evs.dragstart(figure_index, joint_index)

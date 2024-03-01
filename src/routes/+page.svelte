@@ -12,6 +12,13 @@ function addFigure() {
     panelStage.addFigure()
 }
 
+function scale(by) {
+    panelStage.scale(by)
+}
+
+function render() {
+    panelStage.render()
+}
 </script>
 
 <h1>Welcome to BoardsBot</h1>
@@ -21,10 +28,13 @@ function addFigure() {
 </div>
 
 <p><button on:click={addFigure}>Add Figure</button></p>
+<p><button on:click={() => scale(0.1)}>+ Scale</button></p>
+<p><button on:click={() => scale(-0.1)}>- Scale</button></p>
+<p><button on:click={render}> Render</button></p>
 
 <style>
     .temp {
         border: 1px solid #000;
-        width:512px;
+        width: 768px;
     }
 </style>
