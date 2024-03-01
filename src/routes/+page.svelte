@@ -1,8 +1,9 @@
 <script>
 import { onMount } from 'svelte'
 
-let panel;
-let panelStage;
+let panel
+let panelStage
+let characterInfo
 
 onMount(async () => {
     panel = (await import('$lib/panel.svelte')).default
@@ -12,12 +13,32 @@ function addFigure() {
     panelStage.addFigure()
 }
 
+function addProp() {
+    panelStage.addProp()
+}
+
 function scale(by) {
     panelStage.scale(by)
 }
 
-function render() {
-    panelStage.render()
+let mask;
+
+async function render() {
+    const {control_image, mask_image} = await panelStage.render()
+
+    const res = await fetch('/api/newimg/', {
+            method: 'POST',
+            headers: {
+                'Accept': '*/*'
+            },
+            body: JSON.stringify({
+                prompt: characterInfo,
+                control_image: control_image,
+                mask_image: mask_image
+            }) 
+    })
+    const body = await res.json()
+    console.log(body)
 }
 </script>
 
@@ -28,9 +49,15 @@ function render() {
 </div>
 
 <p><button on:click={addFigure}>Add Figure</button></p>
+<p><button on:click={addProp}>Add Prop</button></p>
 <p><button on:click={() => scale(0.1)}>+ Scale</button></p>
 <p><button on:click={() => scale(-0.1)}>- Scale</button></p>
 <p><button on:click={render}> Render</button></p>
+<p><input type="text" bind:value={characterInfo} placeholder="describe the character"/></p>
+
+{#if mask}
+<p><img src="{mask}" alt="mask"/></p>
+{/if}
 
 <style>
     .temp {
