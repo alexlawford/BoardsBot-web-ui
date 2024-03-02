@@ -3,6 +3,11 @@ import { tick } from 'svelte'
 import { Stage, Layer, Circle, Line, Rect } from 'svelte-konva'
 import { vec } from '$lib/vector.js'
 import { openpose } from '$lib/openpose.js'
+import { panel } from '$lib/stores/model.js';
+
+const test = () => {
+  // $panel.title[1] = 'changed!'
+}
 
 // Structures
 const prop = () => {
@@ -99,19 +104,23 @@ const update = {
     // TO DO *** !!!
     // TO DO -- selecting which figure
     // TO DO *** !!!
-    scale : (factor, figureIndex = 0) => {
-        let origin = model.figures[figureIndex].joints[1]
+    // scale : (factor, figureIndex = 0) => {
+    //     let origin = model.figures[figureIndex].joints[1]
 
-        model.figures[figureIndex].joints.forEach((j, index) => {
-            if(j != 1) {
-                let distance = vec.sub(j, origin)
-                model.figures[figureIndex].joints[index] = vec.sum(j, vec.mult(distance, [factor, factor, factor]))
-            }
-        })
+    //     model.figures[figureIndex].joints.forEach((j, index) => {
+    //         if(j != 1) {
+    //             let distance = vec.sub(j, origin)
+    //             model.figures[figureIndex].joints[index] = vec.sum(j, vec.mult(distance, [factor, factor, factor]))
+    //         }
+    //     })
 
-        model.figures[figureIndex].scale *= 1 + factor
-    }
+    //     model.figures[figureIndex].scale *= 1 + factor
+    // }
 }
+
+panel.subscribe((x) => {
+    update.addFigure()
+})
 
 // Events
 const evs = {
@@ -211,7 +220,7 @@ export const konvaCanvas = {
     }
 }
 </script>
-<Stage config={{width: 768, height: 432}} bind:handle={stage}>
+<Stage config={{width: 512, height: 288}} bind:handle={stage}>
     <Layer>
         <Rect
             config={{
@@ -309,4 +318,3 @@ export const konvaCanvas = {
         {/each}
     </Layer>
 </Stage>
-

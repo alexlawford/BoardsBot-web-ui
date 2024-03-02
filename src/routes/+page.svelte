@@ -6,7 +6,7 @@ let panelStage
 let characterInfo
 
 onMount(async () => {
-    panel = (await import('$lib/panel.svelte')).default
+    panel = (await import('$components/panel.svelte')).default
 })
 
 function addFigure() {
