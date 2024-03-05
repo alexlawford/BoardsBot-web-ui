@@ -1,17 +1,18 @@
 import { vec } from '$lib/vector.js'
 
-export const prop = (offset) => {
+export const prop = (offset, colour) => {
     return {
         type: 'prop',
         description: '',
         points: [[0, 0], [64, 0], [64, 64], [0, 64]], 
-        pos: offset
+        pos: offset,
+        colour: colour
     }
 }
 
-export const figure = (offset) => {
+export const figure = (offset, colour) => {
 
-    const joints = [
+    const points = [
         [0, -33, 23],      // 0 Nose
         [0, 0, 0],         // 1 Neck
         [-30, 3, 0],       // 2 Right Shoulder
@@ -36,8 +37,9 @@ export const figure = (offset) => {
     return {
         type: 'figure',
         description: '',
-        joints: joints.map(j => vec.sum(j, offset)),
+        points: points.map(j => vec.sum(j, offset)),
         headRotation: [0, 0],
-        scale: 1
+        scale: 1, 
+        colour: colour
     }
 }

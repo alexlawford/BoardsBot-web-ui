@@ -14,13 +14,13 @@ const update = {
         update.rotateY(f, -1 * was)
 
         for(let j of [0, 14, 15, 16, 17]) {             
-            $panel.layers[f].joints[j] = vec.sum(
+            $panel.layers[f].points[j] = vec.sum(
                 vec.rotate(
                     'x',
-                    vec.sub($panel.layers[f].joints[j], $panel.layers[f].joints[18]),
+                    vec.sub($panel.layers[f].points[j], $panel.layers[f].points[18]),
                     theta
                 ),
-                $panel.layers[f].joints[18]
+                $panel.layers[f].points[18]
             )
         }
         update.rotateY(f, was)
@@ -29,13 +29,13 @@ const update = {
         $panel.layers[f].headRotation[0] += theta
 
         for(let j of [0, 14, 15, 16, 17]) {
-            $panel.layers[f].joints[j] = vec.sum(
+            $panel.layers[f].points[j] = vec.sum(
                 vec.rotate(
                     'y',
-                    vec.sub($panel.layers[f].joints[j], $panel.layers[f].joints[18]),
+                    vec.sub($panel.layers[f].points[j], $panel.layers[f].points[18]),
                     theta
                 ),
-                $panel.layers[f].joints[18]
+                $panel.layers[f].points[18]
             )
         }
         $panel = $panel
@@ -52,26 +52,26 @@ const events = {
         events.jointDistances = openpose.relations[jointIndex].map(childIndex => {
             return {
                 i: childIndex,
-                dist: vec.sub($panel.layers[layerIndex].joints[childIndex],
-                              $panel.layers[layerIndex].joints[jointIndex])
+                dist: vec.sub($panel.layers[layerIndex].points[childIndex],
+                              $panel.layers[layerIndex].points[jointIndex])
             }
         })
     },
     dragMoveJoint : (e, layerIndex, jointIndex) => {
         let loc = [e.detail.target.x(), e.detail.target.y(), 0]
 
-        $panel.layers[layerIndex].joints[jointIndex] = loc
+        $panel.layers[layerIndex].points[jointIndex] = loc
 
         events.jointDistances.forEach((child) => {
-          $panel.layers[layerIndex].joints[child.i] = vec.sum(loc, child.dist)
+          $panel.layers[layerIndex].points[child.i] = vec.sum(loc, child.dist)
         })
         $panel = $panel
     },
     dragStartHead : (layerIndex) => {
-        events.initialHeadPosition = $panel.layers[layerIndex].joints[18]
+        events.initialHeadPosition = $panel.layers[layerIndex].points[18]
     },
     dragMoveHead : (layerIndex) => {
-        $panel.layers[layerIndex].joints[18] = events.initialHeadPosition
+        $panel.layers[layerIndex].points[18] = events.initialHeadPosition
 
         let pos = stage.getPointerPosition()
         let speed = 0.03
@@ -151,9 +151,9 @@ export const konvaCanvas = {
                 {#if layer.type == 'figure'}
                     <Circle
                         config={{
-                            x: layer.joints[18][0],
-                            y: layer.joints[18][1],
-                            fill: '#000',
+                            x: layer.points[18][0],
+                            y: layer.points[18][1],
+                            fill: layer.colour,
                             radius: mask ? layer.scale * 40 : layer.scale * 25,
                             draggable: true, 
                             visible: mask || ! rendering
@@ -168,23 +168,23 @@ export const konvaCanvas = {
                     />
                     <Line 
                         config={{
-                            points: [layer.joints[4][0],
-                                     layer.joints[4][1],
-                                     layer.joints[3][0],
-                                     layer.joints[3][1],
-                                     layer.joints[2][0],
-                                     layer.joints[2][1],
-                                     layer.joints[1][0],
-                                     layer.joints[1][1],
-                                     layer.joints[5][0],
-                                     layer.joints[5][1],
-                                     layer.joints[6][0],
-                                     layer.joints[6][1],
-                                     layer.joints[7][0],
-                                     layer.joints[7][1],
+                            points: [layer.points[4][0],
+                                     layer.points[4][1],
+                                     layer.points[3][0],
+                                     layer.points[3][1],
+                                     layer.points[2][0],
+                                     layer.points[2][1],
+                                     layer.points[1][0],
+                                     layer.points[1][1],
+                                     layer.points[5][0],
+                                     layer.points[5][1],
+                                     layer.points[6][0],
+                                     layer.points[6][1],
+                                     layer.points[7][0],
+                                     layer.points[7][1],
                             ],
-                            stroke: '#000',
-                            strokeWidth: 24,
+                            stroke: layer.colour,
+                            strokeWidth: 24 * layer.scale,
                             lineCap: 'round',
                             lineJoin: 'round',
                             tension: 0.3
@@ -193,15 +193,15 @@ export const konvaCanvas = {
                     <Line 
                         config={{
                             points: [
-                                    layer.joints[8][0],
-                                    layer.joints[8][1],
-                                    layer.joints[9][0],
-                                    layer.joints[9][1],
-                                    layer.joints[10][0],
-                                    layer.joints[10][1],
+                                    layer.points[8][0],
+                                    layer.points[8][1],
+                                    layer.points[9][0],
+                                    layer.points[9][1],
+                                    layer.points[10][0],
+                                    layer.points[10][1],
                             ],
-                            stroke: '#000',
-                            strokeWidth: 24,
+                            stroke: layer.colour,
+                            strokeWidth: 24 * layer.scale,
                             lineCap: 'round',
                             lineJoin: 'round',
                             tension: 0.3
@@ -210,15 +210,15 @@ export const konvaCanvas = {
                     <Line 
                         config={{
                             points: [
-                                    layer.joints[11][0],
-                                    layer.joints[11][1],
-                                    layer.joints[12][0],
-                                    layer.joints[12][1],
-                                    layer.joints[13][0],
-                                    layer.joints[13][1],
+                                    layer.points[11][0],
+                                    layer.points[11][1],
+                                    layer.points[12][0],
+                                    layer.points[12][1],
+                                    layer.points[13][0],
+                                    layer.points[13][1],
                             ],
-                            stroke: '#000',
-                            strokeWidth: 24,
+                            stroke: layer.colour,
+                            strokeWidth: 24 * layer.scale,
                             lineCap: 'round',
                             lineJoin: 'round',
                             tension: 0.3
@@ -227,28 +227,28 @@ export const konvaCanvas = {
                     <Line 
                         config={{
                             points: [
-                                    layer.joints[2][0],
-                                    layer.joints[2][1],
-                                    layer.joints[5][0],
-                                    layer.joints[5][1],
-                                    layer.joints[11][0],
-                                    layer.joints[11][1],
-                                    layer.joints[8][0],
-                                    layer.joints[8][1],
+                                    layer.points[2][0],
+                                    layer.points[2][1],
+                                    layer.points[5][0],
+                                    layer.points[5][1],
+                                    layer.points[11][0],
+                                    layer.points[11][1],
+                                    layer.points[8][0],
+                                    layer.points[8][1],
                             ],
-                            stroke: '#000',
-                            strokeWidth: 24,
+                            stroke: layer.colour,
+                            strokeWidth: 24 * layer.scale,
                             lineCap: 'round',
                             lineJoin: 'round',
                             tension: 0,
-                            fill: '#000',
+                            fill: layer.colour,
                             closed: true
                         }}
                     />
                     {#each openpose.bones as b, boneIndex}
                         <Line 
                             config={{ 
-                                points: [layer.joints[b[0]][0], layer.joints[b[0]][1], layer.joints[b[1]][0], layer.joints[b[1]][1]],
+                                points: [layer.points[b[0]][0], layer.points[b[0]][1], layer.points[b[1]][0], layer.points[b[1]][1]],
                                 stroke: mask ? '#fff' : rendering ? openpose.colours.bones[boneIndex] : "#000", 
                                 strokeWidth: mask ? layer.scale * 40 : 4,
                                 lineCap: 'round', 
@@ -256,13 +256,13 @@ export const konvaCanvas = {
                             }}
                         />
                     {/each}
-                    {#each layer.joints as joint, jointIndex}
+                    {#each layer.points as joint, jointIndex}
                         <Circle
                             config={{
                                 x: joint[0],
                                 y: joint[1],
-                                radius: [14, 15].includes(jointIndex) ? 2: 4,
-                                fill: rendering ? openpose.colours.joints[jointIndex] : '#FFF',
+                                radius: [14, 15].includes(jointIndex) ? 2 * layer.scale: 4,
+                                fill: rendering ? openpose.colours.points[jointIndex] : '#FFF',
                                 stroke: '#38BDF8',
                                 strokeWidth: rendering || [14, 15].includes(jointIndex) ? 0 : 1,
                                 draggable: ! [0, 14, 15, 16, 17].includes(jointIndex),
@@ -280,7 +280,7 @@ export const konvaCanvas = {
                     <Line
                         config={{
                             closed: true,
-                            fill: '#000',
+                            fill: layer.colour,
                             points: layer.points.flat(),
                             draggable: $state.selected == layerIndex,
                             x: layer.pos[0],

@@ -1,5 +1,6 @@
 <script>
 import Layers from '$components/layers.svelte';
+import Tools from '$components/tools.svelte';
 
 import { onMount } from 'svelte'
 
@@ -14,7 +15,7 @@ onMount(async () => {
 
 <div class="wrapper">
   <header class="header"></header>
-  <aside class="left-sidebar"></aside>
+  <aside class="left-sidebar"><Tools /></aside>
   <main class="main-content"><svelte:component this={panel} bind:konvaCanvas={panelStage} /></main>
   <section class="right-sidebar"><Layers /></section>
 </div>
@@ -22,7 +23,7 @@ onMount(async () => {
 <style>
 .wrapper {
   display:grid;
-  grid-template-rows: 48px 1fr 48px 1fr;
+  grid-template-rows: 48px 1fr 72px 1fr;
   grid-template-areas:
     'header'
     'main-content'
@@ -56,7 +57,7 @@ onMount(async () => {
 
 @media (min-width:1024px) {
     .wrapper {
-        grid-template-columns: 48px 1fr 240px;
+        grid-template-columns: 72px 1fr 240px;
         grid-template-rows: 48px 1fr;
         grid-template-areas:
             'header header header'

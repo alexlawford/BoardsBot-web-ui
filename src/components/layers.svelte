@@ -1,6 +1,7 @@
 <script>
 import { panel, state } from '$lib/stores/model.js';
 import { prop, figure } from '$lib/structures.js'
+import { layerColours } from '$lib/settings.js'
 
 let settings = {
     placeholder : 'Add a description'
@@ -11,11 +12,13 @@ $: selected = layers.length - $state.selected - 1
 
 let events = {
     addProp : () => {
-        $state.selected = $panel.layers.push(prop([293, 148])) - 1
+        let colour = $state.pallete.shift()
+        $state.selected = $panel.layers.push(prop([293, 148], colour)) - 1
         $panel = $panel
     },
     addFigure : () => {
-        $state.selected = $panel.layers.push(figure([325, 74])) - 1
+        let colour = $state.pallete.shift()
+        $state.selected = $panel.layers.push(figure([325, 74], colour)) - 1
         $panel = $panel
     },
     selectLayer : (i) => {
@@ -45,7 +48,8 @@ let events = {
     }, 
     deleteLayer: () => {
         if($state.selected != 0) {
-            $panel.layers.splice($state.selected, 1)
+            let deleted = $panel.layers.splice($state.selected, 1)[0]
+            $state.pallete.push(deleted.colour)
             $panel = $panel
         }
     }
@@ -67,7 +71,7 @@ let events = {
                  on:drop={(e) => events.drop(e, layerIndex)}
             >
             {#if selected == layerIndex}
-                <div class="icon-grid-icon"><img src="/icon-{layer.type}-layer.svg" alt="type: {layer.type} (icon)"/></div>
+                <div class="icon-grid-icon" style="background-color: {layer.colour};"><img src="/icon-{layer.type}-layer.svg" alt="type: {layer.type} (icon)"/></div>
                 <div class="rest">
                     <input bind:value={$panel.layers[layers.length - layerIndex - 1].description} placeholder="{settings.placeholder}"
                             class="block"
@@ -75,7 +79,7 @@ let events = {
                     />
                 </div>
             {:else}
-                <div class="icon-grid-icon"><img class="icon-grid-icon" src="/icon-{layer.type}-layer.svg" alt="type: {layer.type} (icon)"/></div>
+                <div class="icon-grid-icon" style="background-color: {layer.colour};"><img class="icon-grid-icon" src="/icon-{layer.type}-layer.svg" alt="type: {layer.type} (icon)"/></div>
                 <button class="rest" on:click={() => events.selectLayer(layerIndex)}>
                     {#if layer.description}
                         <p class="truncate">{layer.description}</p>
@@ -88,7 +92,7 @@ let events = {
         {/each}
     </div>
     <div class="margin-y two-grid">
-        {#if $panel.layers.length < 5}
+        {#if $panel.layers.length < 6}
             <button class="button" on:click={events.addProp}>+ Object</button>
             <button class="button" on:click={events.addFigure}>+ Figure</button>
         {/if}
@@ -124,6 +128,9 @@ let events = {
 }
 
 .icon-grid > .icon-grid-icon {
+    border-radius: 12px;
+    width: 24px;
+    margin-left: 6px;
     grid-area: icon;
     line-height: 24px;
     text-align: center;
