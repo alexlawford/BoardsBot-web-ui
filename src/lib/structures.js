@@ -6,7 +6,8 @@ export const prop = (offset, colour) => {
         description: '',
         points: [[0, 0], [64, 0], [64, 64], [0, 64]], 
         pos: offset,
-        colour: colour
+        colour: colour,
+        scribbles: []
     }
 }
 
@@ -29,8 +30,8 @@ export const figure = (offset, colour) => {
         [22, 270, 0],      // 13 Left Ankle
         [-10, -43, 22],    // 14 Right Eye
         [10, -43, 22],     // 15 Left Eye
-        [-23, -40, 9],    // 16 Right Ear
-        [23, -40, 9],     // 17 Left Ear
+        [-23, -40, 9],     // 16 Right Ear
+        [23, -40, 9],      // 17 Left Ear
         [0, -43, 0]        // -- Additional -- Head Positioning
     ]
 

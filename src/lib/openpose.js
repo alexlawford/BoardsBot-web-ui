@@ -42,24 +42,25 @@ const bones = [
 
 const colours = {
     joints: [
-        '#FF0000',
-        '#FF5500',
-        '#FFAA00',
-        '#FFFF00',
-        '#AAFF00',
-        '#55FF00',
-        '#00FF00',
-        '#00FF55',
-        '#00FFAA',
-        '#00FFFF',
-        '#00AAFF',
-        '#0055FF',
-        '#0000FF',
-        '#5500FF',
-        '#AA00FF',
-        '#FF00FF',
-        '#FF00AA',
-        '#FF0055'
+        '#FF0000', // 0
+        '#FF5500', // 1
+        '#FFAA00', // 2
+        '#FFFF00', // 3
+        '#AAFF00', // 4
+        '#55FF00', // 5
+        '#00FF00', // 6
+        '#00FF55', // 7
+        '#00FFAA', // 8
+        '#00FFFF', // 9
+        '#00AAFF', // 10
+        '#0055FF', // 11
+        '#0000FF', // 12
+        '#5500FF', // 13
+        '#AA00FF', // 14
+        '#FF00FF', // 15
+        '#FF00AA', // 16
+        '#FF0055', // 17
+        'rgba(0,0,0,0)' // 18 -- head position joint is transparent hack
     ],
     bones: [
         '#990000',

@@ -32,7 +32,8 @@ async function render() {
                 'Accept': '*/*'
             },
             body: JSON.stringify({
-                prompt: characterInfo,
+                seed: 32,
+                prompt: "A woman in a red in the artic looking at a polar bear",
                 control_image: control_image,
                 mask_image: mask_image
             }) 

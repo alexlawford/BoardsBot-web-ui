@@ -31,15 +31,21 @@ const events = {
     center : () => {
         const target = $panel.layers[$state.selected]
         if(target.type == 'prop') {
-            target.pos = [293, 148]
+            target.pos = [224, 224]  // TO DO -- move into state
         } else if(target.type == 'figure') {
             const center = target.points[1]
-            const origin = [325, 74, 0]
+            const origin = [256, 150, 0] // TO DO -- move into state
             target.points.forEach((point, index) => {
                 target.points[index] = vec.sum(origin, vec.sub(point, center))
             })
         }
         $panel = $panel
+    },
+    toolDraw : () => {
+        $state.tool = 'draw'
+    },
+    toolMove : () => {
+        $state.tool = 'move'
     }
 }
 </script>
@@ -47,6 +53,8 @@ const events = {
     <button class="button w-full" on:click={() => events.scale(0.1)}>+</button>
     <button class="button w-full" on:click={() => events.scale(-0.1)}>-</button>
     <button class="button w-full" on:click={events.center}>0,0</button>
+    <button class="button w-full {$state.tool == 'draw' ? 'selected' : ''}" on:click={events.toolDraw}>Draw</button>
+    <button class="button w-full {$state.tool == 'move' ? 'selected' : ''}" on:click={events.toolMove}>Move</button>
 </div>
 <style>
 .w-full {
@@ -57,5 +65,9 @@ const events = {
 }
 button {
     margin-bottom: 12px;
+}
+.selected {
+    background-color: #333;
+    color: #fff;
 }
 </style>

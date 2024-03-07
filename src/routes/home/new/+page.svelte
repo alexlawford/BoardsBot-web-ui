@@ -11,16 +11,46 @@ onMount(async () => {
     panel = (await import('$components/panel.svelte')).default
 })
 
+const render = async () => {  
+    const sketch = await panelStage.render()
+
+    const res = await fetch('/api/newimg/', {
+        method: 'POST',
+        headers: {
+            'Accept': '*/*'
+        },
+        body: JSON.stringify(sketch)
+    })
+    const body = await res.json()
+    console.log(body)
+}
+
 </script>
 
 <div class="wrapper">
-  <header class="header"></header>
-  <aside class="left-sidebar"><Tools /></aside>
-  <main class="main-content"><svelte:component this={panel} bind:konvaCanvas={panelStage} /></main>
-  <section class="right-sidebar"><Layers /></section>
+    <header class="header"></header>
+    <aside class="left-sidebar"><Tools /></aside>
+    <main class="main-content"><svelte:component this={panel} bind:konvaCanvas={panelStage} /></main>
+    <section class="right-sidebar">
+        <Layers />
+        <div class="text-center margin-y">
+            <button class="button padding-x" on:click={render}>Render</button>
+        </div>
+    </section>
 </div>
 
 <style>
+.text-center {
+    text-align: center;
+}
+.margin-y {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+.padding-x {
+    padding-left: 24px;
+    padding-right: 24px;
+}
 .wrapper {
   display:grid;
   grid-template-rows: 48px 1fr 72px 1fr;

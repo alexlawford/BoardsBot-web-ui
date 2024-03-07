@@ -1,28 +1,24 @@
 <script>
 import { panel, state } from '$lib/stores/model.js';
 import { prop, figure } from '$lib/structures.js'
-import { layerColours } from '$lib/settings.js'
 
 let settings = {
     placeholder : 'Add a description'
 }
 
-$: layers = $panel.layers.slice().reverse()
-$: selected = layers.length - $state.selected - 1
-
 let events = {
     addProp : () => {
         let colour = $state.pallete.shift()
-        $state.selected = $panel.layers.push(prop([293, 148], colour)) - 1
+        $state.selected = $panel.layers.push(prop([224, 224], colour)) - 1 // TO DO -- move into state
         $panel = $panel
     },
     addFigure : () => {
         let colour = $state.pallete.shift()
-        $state.selected = $panel.layers.push(figure([325, 74], colour)) - 1
+        $state.selected = $panel.layers.push(figure([256, 150], colour)) - 1 // TO DO -- move into state
         $panel = $panel
     },
     selectLayer : (i) => {
-        $state.selected = layers.length - i - 1
+        $state.selected = i
     },
     dragStart : (layerIndex) => {
         $state.dragging = layerIndex
@@ -36,12 +32,10 @@ let events = {
     },
     drop : (e, layerIndex) => {
         e.preventDefault()
-        if(layerIndex != $state.dragging && layerIndex != layers.length - 1) {
-            const layer = layers[$state.dragging]
-            layers.splice($state.dragging, 1)
-            layers.splice(layerIndex, 0, layer)
-            $state.selected = layers.length - layerIndex - 1
-            $panel.layers = layers.slice().reverse()
+        if(layerIndex != $state.dragging && $state.dragging != 0 && layerIndex != 0) {
+            let layer = $panel.layers.splice($state.dragging, 1)[0]
+            $panel.layers.splice(layerIndex, 0, layer)
+            $state.selected = layerIndex
             $panel = $panel
         }
         $state.over = -1
@@ -60,20 +54,20 @@ let events = {
     <div class="border-b">
         <h1 class="margin-y text-center strong">Layers</h1>
     </div>
-    <div class="w-240">
-        {#each layers as layer, layerIndex}
+    <div class="w-240 flex-row-reverse">
+        {#each $panel.layers as layer, layerIndex}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div draggable="true"
-                 class="icon-grid border-b {selected == layerIndex ? 'bg-sky' : ''} {$state.over == layerIndex ? 'bg-sky' : ''}"
+                 class="icon-grid border-b {$state.selected == layerIndex ? 'bg-sky' : ''} {$state.over == layerIndex ? 'bg-sky' : ''}"
                  on:dragstart={() => events.dragStart(layerIndex)}
                  on:dragover={(e) => events.dragOver(e, layerIndex)}
                  on:dragleave={events.dragLeave}
                  on:drop={(e) => events.drop(e, layerIndex)}
             >
-            {#if selected == layerIndex}
+            {#if $state.selected == layerIndex}
                 <div class="icon-grid-icon" style="background-color: {layer.colour};"><img src="/icon-{layer.type}-layer.svg" alt="type: {layer.type} (icon)"/></div>
                 <div class="rest">
-                    <input bind:value={$panel.layers[layers.length - layerIndex - 1].description} placeholder="{settings.placeholder}"
+                    <input bind:value={$panel.layers[layerIndex].description} placeholder="{settings.placeholder}"
                             class="block"
                             on:keyup={events.linkLayerModel}
                     />
@@ -187,5 +181,10 @@ let events = {
     width: 16px;
     vertical-align: -3px;
     margin-right: 4px;
+}
+
+.flex-row-reverse {
+    display: flex;
+    flex-direction: column-reverse;
 }
 </style>
