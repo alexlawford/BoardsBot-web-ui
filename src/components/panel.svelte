@@ -171,6 +171,7 @@ export const konvaCanvas = {
         return sketch
     }
 }
+
 </script>
 <div class="border bg-white">
     <Stage config={{width: 512, height: 512}} bind:handle={stage} on:mouseup={events.stageMouseUp}>
@@ -294,9 +295,9 @@ export const konvaCanvas = {
                         lineCap: 'round',
                         lineJoin: 'round',
                         tension: 0,
-                        fill: mask ? '#FFF' : layer.colour,
+                        fill: mask ? '#FFF' : (layer.points[2][0] < layer.points[5][0] ? layer.colour: '#000'),
                         visible: ! rendering || rendering && mask,
-                        closed: true
+                        closed: true,
                     }}
                 />
                 <!--  - - - - Bones - - - -  -->

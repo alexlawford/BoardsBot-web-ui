@@ -66,14 +66,30 @@ const events = {
     },
     toolMove : () => {
         $state.tool = 'move'
+    },
+    flip : () => {
+        if($panel.layers[$state.selected].type == 'figure') {
+            const neckX = $panel.layers[$state.selected].points[1][0]
+
+            $panel.layers[$state.selected].points.forEach(point => {
+                const dist = neckX - point[0]
+                point[0] = neckX + dist
+            })
+
+            $panel = $panel
+        }
     }
 }
+
+// they are 2 and 4 ... should become 6
 </script>
 <div class="p-12">
     <button class="button w-full {$state.tool == 'move' ? 'selected' : ''}" on:click={events.toolMove}><img src="/move.svg" alt="pointer tool" /></button>
     <button class="button w-full" on:click={() => events.scale(0.1)}><img src="/zoom-in.svg" alt="zoom in tool" /></button>
     <button class="button w-full" on:click={() => events.scale(-0.1)}><img src="/zoom-out.svg" alt="zoom out tool" /></button>
     <button class="button w-full" on:click={events.center}><img src="/crosshair.svg" alt="center tool" /></button>
+    <button class="button w-full {$panel.layers[$state.selected].type == 'figure' ? '' : 'greyed-out'}" on:click={events.flip}><img src="/flip.svg" alt="center tool" /></button>
+
     <button class="button w-full {$panel.layers[$state.selected].type == 'prop' ? '' : 'greyed-out'} {$state.tool == 'draw' ? 'selected' : ''}" on:click={events.toolDraw}><img src="/pen-tool.svg" alt="pen tool" /></button>
     <button class="button w-full {$panel.layers[$state.selected].type == 'prop' ? '' : 'greyed-out'} {$state.tool == 'erase' ? 'selected' : ''}" on:click={events.toolErase}><img src="/eraser.svg" alt="eraser tool" /></button>
 </div>
