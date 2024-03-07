@@ -84,7 +84,7 @@ const events = {
 .p-12 {
     padding: 12px;
 }
-button {
+.button {
     margin-bottom: 12px;
 }
 .selected {

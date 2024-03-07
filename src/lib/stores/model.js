@@ -10,6 +10,7 @@ export const panel = writable({
 
 export const state = writable({
     selected: 0,
+    modal: false,
     over: -1,
     dragging: -1,
     pallete: ['#0072b2', '#e69f00', '#56b4e9', '#009e73', '#f0e442'],

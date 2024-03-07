@@ -1,17 +1,36 @@
 <script>
 import Layers from '$components/layers.svelte';
 import Tools from '$components/tools.svelte';
+import Modal from '$components/modal.svelte';
+import { panel, state } from '$lib/stores/model.js';
 
 import { onMount } from 'svelte'
 
-let panel
+let panelOb
 let panelStage
 
 onMount(async () => {
-    panel = (await import('$components/panel.svelte')).default
+    panelOb = (await import('$components/panel.svelte')).default
 })
 
 const render = async () => {  
+
+    const missingDescriptions = $panel.layers.find((layer) => {
+        return layer.description == ''
+    })
+
+    if(missingDescriptions != undefined) {
+        return $state.modal = "Please give a description for all layers."
+    }    
+
+    const missingScribbles = $panel.layers.find((layer) => {
+        return layer.type == 'prop' && layer.scribbles.length == 0
+    })
+
+    if(missingScribbles != undefined) {
+        return $state.modal = "Please make sure you've sketched every prop."
+    } 
+
     const sketch = await panelStage.render()
 
     const res = await fetch('/api/newimg/', {
@@ -30,7 +49,7 @@ const render = async () => {
 <div class="wrapper">
     <header class="header"></header>
     <aside class="left-sidebar"><Tools /></aside>
-    <main class="main-content"><svelte:component this={panel} bind:konvaCanvas={panelStage} /></main>
+    <main class="main-content"><svelte:component this={panelOb} bind:konvaCanvas={panelStage} /></main>
     <section class="right-sidebar">
         <Layers />
         <div class="text-center padding-x">
@@ -38,7 +57,9 @@ const render = async () => {
         </div>
     </section>
 </div>
-
+{#if $state.modal}
+    <Modal />
+{/if}
 <style>
 .text-center {
     text-align: center;
