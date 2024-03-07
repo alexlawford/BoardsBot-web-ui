@@ -19,7 +19,7 @@ const render = async () => {
         headers: {
             'Accept': '*/*'
         },
-        body: JSON.stringify(sketch)
+        body: JSON.stringify({layers: sketch})
     })
     const body = await res.json()
     console.log(body)
@@ -33,8 +33,8 @@ const render = async () => {
     <main class="main-content"><svelte:component this={panel} bind:konvaCanvas={panelStage} /></main>
     <section class="right-sidebar">
         <Layers />
-        <div class="text-center margin-y">
-            <button class="button padding-x" on:click={render}>Render</button>
+        <div class="text-center padding-x">
+            <button class="button w-full margin-x" on:click={render}>Render</button>
         </div>
     </section>
 </div>
@@ -43,13 +43,12 @@ const render = async () => {
 .text-center {
     text-align: center;
 }
-.margin-y {
-    margin-top: 24px;
-    margin-bottom: 24px;
+.w-full {
+    width: 100%;
 }
 .padding-x {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 12px;
+    padding-right: 12px;
 }
 .wrapper {
   display:grid;

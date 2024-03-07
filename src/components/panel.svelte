@@ -1,6 +1,6 @@
 <script>
     import { tick } from 'svelte'
-    import { Stage, Layer, Circle, Line, Rect } from 'svelte-konva'
+    import { Stage, Layer, Circle, Line, Rect, Group } from 'svelte-konva'
     import { vec } from '$lib/vector.js'
     import { openpose } from '$lib/openpose.js'
     import { panel, state } from '$lib/stores/model.js'
@@ -124,6 +124,13 @@ const events = {
     },
     stageMouseUp : () => {
         events.painting = false
+    },
+    clickScribble : (layerIndex, scribbleIndex) => {
+        console.log(scribbleIndex)
+        if($state.tool == 'erase' && $state.selected == layerIndex) {
+            $panel.layers[layerIndex].scribbles.splice(scribbleIndex, 1)
+            $panel = $panel
+        }
     }
 }
 
@@ -154,7 +161,8 @@ export const konvaCanvas = {
             sketch.push({
                 control: controlImage,
                 mask: maskImage,
-                prompt: $panel.layers[renderLayer].description
+                prompt: $panel.layers[renderLayer].description,
+                type: $panel.layers[renderLayer].type
             })
         }
 
@@ -309,7 +317,7 @@ export const konvaCanvas = {
                         config={{
                             x: joint[0],
                             y: joint[1],
-                            radius: ([14, 15].includes(jointIndex) && ! rendering) ? 2 * layer.scale: 4,
+                            radius: ([14, 15].includes(jointIndex) && ! rendering) ? 2 * layer.scale: 6,
                             fill: rendering ? openpose.colours.joints[jointIndex] : '#FFF',
                             stroke: '#38BDF8',
                             strokeWidth: rendering || [14, 15].includes(jointIndex) ? 0 : 1,
@@ -325,7 +333,17 @@ export const konvaCanvas = {
                     />
                 {/each}
             {:else if layer.type == 'prop'}
-                {#each layer.scribbles as scribble}
+                <Group config={{
+                    clipFunc: (c) => {
+                        c.beginPath()
+                        c.moveTo(layer.pos[0] + layer.points[0][0], layer.pos[1] + layer.points[0][1])
+                        c.lineTo(layer.pos[0] + layer.points[1][0], layer.pos[1] + layer.points[1][1])
+                        c.lineTo(layer.pos[0] + layer.points[2][0], layer.pos[1] + layer.points[2][1])
+                        c.lineTo(layer.pos[0] + layer.points[3][0], layer.pos[1] + layer.points[3][1])
+                        c.closePath()
+                    }
+                }}>
+                {#each layer.scribbles as scribble, scribbleIndex}
                     <!--  - - - - Scribbles/Sketches - - - -  -->
                     <Line
                         config={{
@@ -336,10 +354,14 @@ export const konvaCanvas = {
                             points: scribble,
                             x: layer.pos[0],
                             y: layer.pos[1],
-                            visible: ! mask
+                            visible: ! mask,
                         }}
+                        on:click={
+                            () => events.clickScribble(layerIndex, scribbleIndex)
+                        }
                     />
                 {/each}
+                </Group>
                 <!--  - - - - Sketch Borders - - - -  -->
                 <Line
                     config={{
@@ -347,12 +369,15 @@ export const konvaCanvas = {
                         stroke: mask ? '#FFF' : layer.colour,
                         strokeWidth: mask ? 10 : 2,
                         fill: mask ? '#FFF' : 'rgba(255,255,255,0.0)',
+                        fillEnabled:  $state.tool != 'erase',
                         points: layer.points.flat(),
-                        draggable: $state.selected == layerIndex && $state.tool != 'draw',
+                        draggable: $state.selected == layerIndex && $state.tool == 'move',
                         x: layer.pos[0],
                         y: layer.pos[1],
                         tension: 0.05,
                         visible: mask || (layerIndex == $state.selected && ! rendering),
+                        dash: [5, 5],
+                        dashEnabled: ! mask
                     }}
                     on:dragmove={
                         (e) => events.dragMoveProp(e, layerIndex)
@@ -368,7 +393,7 @@ export const konvaCanvas = {
                 {#each layer.points as point, pointIndex}
                     <Circle
                         config={{
-                            radius: 5,
+                            radius: 6,
                             fill: '#FFF',
                             x: layer.pos[0] + point[0],
                             y: layer.pos[1] + point[1],

@@ -141,6 +141,13 @@ button {
     border-radius: 4px;
 }
 
+.button img {
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    vertical-align: -6px;
+}
+
 .button:hover {
     background: #AAA;
 }

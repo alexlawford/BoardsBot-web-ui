@@ -19,6 +19,9 @@ let events = {
     },
     selectLayer : (i) => {
         $state.selected = i
+        if($panel.layers[i].type != 'prop') {
+            $state.tool = 'move'
+        }
     },
     dragStart : (layerIndex) => {
         $state.dragging = layerIndex
@@ -42,7 +45,9 @@ let events = {
     }, 
     deleteLayer: () => {
         if($state.selected != 0) {
-            let deleted = $panel.layers.splice($state.selected, 1)[0]
+            let target = $state.selected
+            $state.selected = 0
+            let deleted = $panel.layers.splice(target, 1)[0]
             $state.pallete.push(deleted.colour)
             $panel = $panel
         }
@@ -85,14 +90,12 @@ let events = {
             </div>
         {/each}
     </div>
-    <div class="margin-y two-grid">
+    <div class="margin-y three-grid">
         {#if $panel.layers.length < 6}
-            <button class="button" on:click={events.addProp}>+ Object</button>
-            <button class="button" on:click={events.addFigure}>+ Figure</button>
+            <button class="button" on:click={events.addProp}><img src="/add-prop.svg" alt="add prop icon" /></button>
+            <button class="button" on:click={events.addFigure}><img src="/add-figure.svg" alt="add figure icon" /></button>
         {/if}
-    </div>
-    <div class="margin-y text-center">
-        <button class="underline" on:click={events.deleteLayer} ><img src="/icon-trash.svg" alt="trash icon" class="tiny"/>Delete Layer</button>
+        <button class="button" on:click={events.deleteLayer}><img src="/trash.svg" alt="trash icon" /></button>
     </div>
 </section>
 
@@ -116,7 +119,7 @@ let events = {
 
 .icon-grid {
     display: grid;
-    grid-template-columns: 36px 1fr;
+    grid-template-columns: 48px 1fr;
     grid-template-areas: 'icon rest';
     padding: 6px 0;
 }
@@ -124,7 +127,7 @@ let events = {
 .icon-grid > .icon-grid-icon {
     border-radius: 12px;
     width: 24px;
-    margin-left: 6px;
+    margin-left: 12px;
     grid-area: icon;
     line-height: 24px;
     text-align: center;
@@ -141,7 +144,7 @@ let events = {
 }
 
 .rest > * {
-    width: 195px;
+    width: 183px;
 }
 
 .bg-sky {
@@ -166,21 +169,11 @@ let events = {
     width: 239px;
 }
 
-.two-grid {
+.three-grid {
     display: grid;
     padding: 0 12px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     column-gap: 12px;
-}
-
-.underline {
-    text-decoration: underline;
-}
-
-.tiny {
-    width: 16px;
-    vertical-align: -3px;
-    margin-right: 4px;
 }
 
 .flex-row-reverse {

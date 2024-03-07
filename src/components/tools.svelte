@@ -22,6 +22,19 @@ const events = {
                 const distance = vec.sub(point, origin)
                 target.points[index] = vec.sum(point, vec.mult(distance, [factor, factor, factor]))
             })
+            if(target.type == 'prop') {
+                target.scribbles.forEach((scribble, scribbleIndex) => {
+                    scribble.forEach((point, pointIndex) => {
+                        let d
+                        if(pointIndex%2 == 0) { // is 'x' point
+                            d = point - origin[0]
+                        } else {
+                            d = point - origin[1]
+                        }
+                        target.scribbles[scribbleIndex][pointIndex] = point + d * factor
+                    })
+                })
+            }
             if(target.type == 'figure') {
                 target.scale *= 1 + factor
             }
@@ -42,7 +55,14 @@ const events = {
         $panel = $panel
     },
     toolDraw : () => {
-        $state.tool = 'draw'
+        if($panel.layers[$state.selected].type == 'prop') {
+            $state.tool = 'draw'
+        }
+    },
+    toolErase : () => {
+        if($panel.layers[$state.selected].type == 'prop') {
+            $state.tool = 'erase'
+        }
     },
     toolMove : () => {
         $state.tool = 'move'
@@ -50,11 +70,12 @@ const events = {
 }
 </script>
 <div class="p-12">
-    <button class="button w-full" on:click={() => events.scale(0.1)}>+</button>
-    <button class="button w-full" on:click={() => events.scale(-0.1)}>-</button>
-    <button class="button w-full" on:click={events.center}>0,0</button>
-    <button class="button w-full {$state.tool == 'draw' ? 'selected' : ''}" on:click={events.toolDraw}>Draw</button>
-    <button class="button w-full {$state.tool == 'move' ? 'selected' : ''}" on:click={events.toolMove}>Move</button>
+    <button class="button w-full {$state.tool == 'move' ? 'selected' : ''}" on:click={events.toolMove}><img src="/move.svg" alt="pointer tool" /></button>
+    <button class="button w-full" on:click={() => events.scale(0.1)}><img src="/zoom-in.svg" alt="zoom in tool" /></button>
+    <button class="button w-full" on:click={() => events.scale(-0.1)}><img src="/zoom-out.svg" alt="zoom out tool" /></button>
+    <button class="button w-full" on:click={events.center}><img src="/crosshair.svg" alt="center tool" /></button>
+    <button class="button w-full {$panel.layers[$state.selected].type == 'prop' ? '' : 'greyed-out'} {$state.tool == 'draw' ? 'selected' : ''}" on:click={events.toolDraw}><img src="/pen-tool.svg" alt="pen tool" /></button>
+    <button class="button w-full {$panel.layers[$state.selected].type == 'prop' ? '' : 'greyed-out'} {$state.tool == 'erase' ? 'selected' : ''}" on:click={events.toolErase}><img src="/eraser.svg" alt="eraser tool" /></button>
 </div>
 <style>
 .w-full {
@@ -68,6 +89,17 @@ button {
 }
 .selected {
     background-color: #333;
-    color: #fff;
+}
+.greyed-out {
+    color: #999;
+}
+.greyed-out:hover {
+    background: #CCC;
+}
+.greyed-out img {
+    filter: invert(50%);
+}
+.selected img {
+    filter: invert()
 }
 </style>

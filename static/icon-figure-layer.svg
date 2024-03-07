@@ -1,7 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg x="0pt" y="0pt" width="32pt" height="32pt" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <g id="Layer 2">
-    <path id="Path 19" style="fill:none;opacity:1;stroke:#999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-width:2;" d="M5.46474,29.4579 C5.06039,29.4579,4.73254,29.1303,4.7325,28.7259 C4.7325,23.8519,7.82725,19.7007,12.1589,18.1301 C13.2808,18.8647,14.6222,19.2919,16.0633,19.2919 C17.485,19.2919,18.8095,18.8762,19.922,18.1598 C24.2113,19.7525,27.2675,23.8823,27.2675,28.7259 C27.2675,29.1303,26.9396,29.4579,26.5353,29.4579 C26.5353,29.4579,5.46474,29.4579,5.46474,29.4579 z"/>
-    <path id="Path" style="fill:none;opacity:1;stroke:#999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-width:2;" d="M16,2.54212 C19.2985,2.54212,21.9724,5.21606,21.9724,8.51452 C21.9724,11.813,19.2985,14.4869,16,14.4869 C12.7015,14.4869,10.0276,11.813,10.0276,8.51452 C10.0276,5.21606,12.7015,2.54212,16,2.54212 z"/>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
