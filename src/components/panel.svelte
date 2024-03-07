@@ -2,45 +2,9 @@
     import { tick } from 'svelte'
     import { Stage, Layer, Circle, Line, Rect, Group } from 'svelte-konva'
     import { vec } from '$lib/vector.js'
+    import { rotateX, rotateY } from '$lib/head.js'
     import { openpose } from '$lib/openpose.js'
     import { panel, state } from '$lib/stores/model.js'
-
-const update = {
-   rotateX : (f, theta) => {
-        $panel.layers[f].headRotation[1] += theta
-
-        let was = $panel.layers[f].headRotation[0]
-
-        update.rotateY(f, -1 * was)
-
-        for(let j of [0, 14, 15, 16, 17]) {             
-            $panel.layers[f].points[j] = vec.sum(
-                vec.rotate(
-                    'x',
-                    vec.sub($panel.layers[f].points[j], $panel.layers[f].points[18]),
-                    theta
-                ),
-                $panel.layers[f].points[18]
-            )
-        }
-        update.rotateY(f, was)
-    },
-    rotateY : (f, theta) => {                     
-        $panel.layers[f].headRotation[0] += theta
-
-        for(let j of [0, 14, 15, 16, 17]) {
-            $panel.layers[f].points[j] = vec.sum(
-                vec.rotate(
-                    'y',
-                    vec.sub($panel.layers[f].points[j], $panel.layers[f].points[18]),
-                    theta
-                ),
-                $panel.layers[f].points[18]
-            )
-        }
-        $panel = $panel
-    }
-}
 
 const events = {
     jointDistances : [],
@@ -76,21 +40,22 @@ const events = {
         $panel.layers[layerIndex].points[18] = events.initialHeadPosition
 
         let pos = stage.getPointerPosition()
-        let speed = 0.03
+        let speed = 0.05
 
         if(events.previousPosition) {
             if(pos.x > events.previousPosition.x) {
-                update.rotateY(layerIndex, speed)
+                rotateY($panel.layers[layerIndex], speed)
             }
             if(pos.x < events.previousPosition.x) {
-                update.rotateY(layerIndex, -1 * speed)
+                rotateY($panel.layers[layerIndex], -1 * speed)
             }
             if(pos.y > events.previousPosition.y) {
-                update.rotateX(layerIndex, -1 * speed)
+                rotateX($panel.layers[layerIndex], -1 * speed)
             }
             if(pos.y < events.previousPosition.y) {
-                update.rotateX(layerIndex, speed)
+                rotateX($panel.layers[layerIndex], speed)
             }
+            $panel = $panel
         }
         events.previousPosition = pos
     },
@@ -318,10 +283,11 @@ export const konvaCanvas = {
                         config={{
                             x: joint[0],
                             y: joint[1],
-                            radius: ([14, 15].includes(jointIndex) && ! rendering) ? 2 * layer.scale: 6,
+                            radius: ([14, 15].includes(jointIndex) && ! rendering) ? 3 * layer.scale: 6,
                             fill: rendering ? openpose.colours.joints[jointIndex] : '#FFF',
-                            stroke: '#38BDF8',
-                            strokeWidth: rendering || [14, 15].includes(jointIndex) ? 0 : 1,
+                            stroke: [14, 15].includes(jointIndex) ? '#000' : '#38BDF8',
+                            strokeWidth: rendering ? 0 : 1,
+                            opacity: rendering || ([14, 15].includes(jointIndex) &&  joint[2] > 0) ? 1.0 : 0.75,
                             draggable: ! [0, 14, 15, 16, 17].includes(jointIndex),
                             visible: ! mask && (rendering || (layerIndex == $state.selected && ! [0, 16, 17].includes(jointIndex)) || [14, 15].includes(jointIndex))
                         }}

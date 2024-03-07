@@ -1,6 +1,7 @@
 <script>
 import { panel, state } from '$lib/stores/model.js';
 import { vec } from '$lib/vector.js'
+import { rotateY } from '$lib/head.js'
 
 const center = function(points) {
     let a = [0, 0]
@@ -71,10 +72,16 @@ const events = {
         if($panel.layers[$state.selected].type == 'figure') {
             const neckX = $panel.layers[$state.selected].points[1][0]
 
-            $panel.layers[$state.selected].points.forEach(point => {
-                const dist = neckX - point[0]
-                point[0] = neckX + dist
+            // Flip all joints apart from face along y axis
+            $panel.layers[$state.selected].points.forEach((point, index) => {
+                if(! [0, 14, 15, 16, 17].includes(index)) {
+                    const dist = neckX - point[0]
+                    point[0] = neckX + dist
+                }
             })
+
+            // Rotate head 180 degrees
+            rotateY($panel.layers[$state.selected], Math.PI)
 
             $panel = $panel
         }
