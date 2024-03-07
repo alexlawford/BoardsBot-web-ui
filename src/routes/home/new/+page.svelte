@@ -95,7 +95,7 @@ const render = async () => {
     grid-area:main-content;
     display: grid;
 	  place-content: center;
-    background-color: #EEEEEE;
+    background-color: #AAAAAA;
     border-bottom: 1px solid #BBB;
 }
 .wrapper > .left-sidebar {
@@ -117,10 +117,10 @@ const render = async () => {
       border-bottom: none;
     }
     .wrapper > .right-sidebar {
-        border-left: 1px solid #BBB;
+        border-left: 1px solid #999;
     }
     .wrapper > .left-sidebar {
-        border-right: 1px solid #BBB;
+        border-right: 1px solid #999;
     }
 }
 </style>

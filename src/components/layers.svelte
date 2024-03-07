@@ -1,6 +1,7 @@
 <script>
-import { panel, state } from '$lib/stores/model.js';
+import { panel, state } from '$lib/stores/model.js'
 import { prop, figure } from '$lib/structures.js'
+import { aspectRatios } from '$lib/settings.js'
 
 let settings = {
     placeholder : 'Add a description'
@@ -51,6 +52,14 @@ let events = {
             $state.pallete.push(deleted.colour)
             $panel = $panel
         }
+    },
+    changeAspect: () => {
+        if($panel.aspect > 3) {
+            $panel.aspect = 0
+        } else {
+            $panel.aspect++
+        }
+        $panel = $panel
     }
 }
 
@@ -97,10 +106,18 @@ let events = {
         {/if}
         <button class="button" on:click={events.deleteLayer}><img src="/trash.svg" alt="trash icon" /></button>
     </div>
+    <div class="margin-y one-two-grid border-y">
+        <button class="button" on:click={events.changeAspect}><img src="/monitor.svg" alt="trash icon" /></button><p class="tall">{aspectRatios[$panel.aspect].name}</p>
+    </div>
 </section>
 
 <style>
 .border-b {
+    border-bottom: 1px solid #BBB;
+}
+
+.border-y {
+    border-top: 1px solid #BBB;
     border-bottom: 1px solid #BBB;
 }
 
@@ -174,6 +191,22 @@ let events = {
     padding: 0 12px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     column-gap: 12px;
+}
+
+.one-two-grid {
+    display: grid;
+    padding: 12px;
+    grid-template-columns: 64px 1fr;
+    column-gap: 12px;
+}
+
+.tall {
+    padding: 11px 0;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 11px;
+
 }
 
 .flex-row-reverse {

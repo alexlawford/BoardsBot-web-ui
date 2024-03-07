@@ -5,6 +5,7 @@
     import { rotateX, rotateY } from '$lib/head.js'
     import { openpose } from '$lib/openpose.js'
     import { panel, state } from '$lib/stores/model.js'
+    import { aspectRatios } from '$lib/settings.js'
 
 const events = {
     jointDistances : [],
@@ -138,22 +139,30 @@ export const konvaCanvas = {
 }
 
 </script>
-<div class="border bg-white">
+<div class="border">
     <Stage config={{width: 512, height: 512}} bind:handle={stage} on:mouseup={events.stageMouseUp}>
         <Layer>
+        <Group config={{
+            clip: {
+                x: 0,
+                y: rendering || mask ? 512 : (512 - aspectRatios[$panel.aspect].height) / 2,
+                width: 512,
+                height: rendering || mask ? 512 : aspectRatios[$panel.aspect].height
+            }
+        }}>
+        <Group>
             <Rect
                 config={{
                     x: 0,
                     y: 0,
                     width: 512,
                     height: 512,
-                    fill: '#000',
-                    visible: rendering
+                    fill: rendering ? '#000' : '#FFF',
                 }}
             />
-        </Layer>
+        </Group>
         {#each $panel.layers as layer, layerIndex}
-        <Layer 
+        <Group 
             config={{
                 visible: ! rendering || renderLayer == layerIndex
             }}
@@ -375,17 +384,9 @@ export const konvaCanvas = {
                     />
                 {/each}
             {/if}
-        </Layer>
+        </Group>
         {/each}
+    </Group>
+        </Layer>
     </Stage>
 </div>
-
-<style>
-.border {
-    border: 1px solid #BBB;
-}
-
-.bg-white {
-    background-color: #FFF;
-}
-</style>

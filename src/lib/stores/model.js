@@ -5,7 +5,8 @@ export const panel = writable({
         type: 'background',
         description: 'A plain white room',
         colour: '#F3F3F3'
-    }]
+    }],
+    aspect: 0
 })
 
 export const state = writable({
