@@ -47,7 +47,8 @@ const render = async () => {
 </script>
 
 <div class="wrapper">
-    <header class="header"></header>
+    <header class="header">
+    </header>
     <aside class="left-sidebar"><Tools /></aside>
     <main class="main-content"><svelte:component this={panelOb} bind:konvaCanvas={panelStage} /></main>
     <section class="right-sidebar">
@@ -57,10 +58,36 @@ const render = async () => {
         </div>
     </section>
 </div>
+<div class="apology">
+    <h1>Sorry about this...</h1>
+    <p>Currently, BoardsBot is only designed for screens of at least 1024px wide &mdash; either have a go at <strong>resizing your browser window</strong>
+        or else you could <strong>try a different device.</strong>
+    <p>We are working hard on versions of BoardsBot for all platforms, though, so check back in soon!</p>
+</div>
 {#if $state.modal}
     <Modal />
 {/if}
 <style>
+.apology {
+    max-width: 720px;
+    padding: 12px;
+    margin: 0 auto;
+}
+.apology h1, .apology strong {
+    font-weight: 700;
+}
+.apology h1 {
+    font-size: 32px;
+    line-height: 48px;
+    margin: 24px 0;
+}
+.apology p, .apology strong {
+    font-size: 16px;
+    color: #333333;
+}
+.apology p {
+    margin-bottom: 24px;
+}
 .text-center {
     text-align: center;
 }
@@ -72,25 +99,14 @@ const render = async () => {
     padding-right: 12px;
 }
 .wrapper {
-  display:grid;
-  grid-template-rows: 48px 1fr 72px 1fr;
-  grid-template-areas:
-    'header'
-    'main-content'
-    'left-sidebar'
-    'right-sidebar';
-  
-  /* fallback height */
-  min-height:100vh;
-
-  /* new small viewport height for modern browsers */
-  min-height:100svh;
+    display: none;
 }
 
 .wrapper > .header {
     grid-area:header;
     background-color: #333333;
 }
+
 .wrapper > .main-content {
     grid-area:main-content;
     display: grid;
@@ -105,8 +121,18 @@ const render = async () => {
     grid-area:right-sidebar;
 }
 
-@media (min-width:1024px) {
+@media (min-width:1023px) {
+    .apology {
+        display: none;
+    }
     .wrapper {
+        /* fallback height */
+        min-height:100vh;
+
+        /* new small viewport height for modern browsers */
+        min-height:100svh;
+
+        display:grid;
         grid-template-columns: 72px 1fr 240px;
         grid-template-rows: 48px 1fr;
         grid-template-areas:
